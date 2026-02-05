@@ -1,3 +1,5 @@
+using Common.Enums;
+
 namespace MusicCatalog.Common.Entities;
 
 public class User : BaseEntity
@@ -7,8 +9,3 @@ public class User : BaseEntity
     public ICollection<Playlist> Playlists { get; } = new List<Playlist>();
 }
 
-public enum Role
-{
-    User,
-    Admin
-}

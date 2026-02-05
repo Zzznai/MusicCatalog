@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using MusicCatalog.Common.Persistance;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("MusicCatalog.Api")));
 
 builder.Services.AddOpenApi();
 

@@ -25,11 +25,9 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure ArtistAward composite key
         modelBuilder.Entity<ArtistAward>()
-            .HasKey(aa => new { aa.ArtistId, aa.AwardId });
+            .HasKey(aa => new { aa.ArtistId, aa.AwardId, aa.Year});
 
-        // Configure ArtistAward relationships
         modelBuilder.Entity<ArtistAward>()
             .HasOne(aa => aa.Artist)
             .WithMany(a => a.ArtistAwards)

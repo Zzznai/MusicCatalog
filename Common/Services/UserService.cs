@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MusicCatalog.Common.Entities;
 using MusicCatalog.Common.Persistance;
@@ -8,6 +10,22 @@ public class UserService : BaseService
 {
     public UserService(ApplicationDbContext context) : base(context)
     {
+    }
+
+    public static (string hash, string salt) HashPassword(string password)
+    {
+        using var hmac = new HMACSHA512();
+        var salt = Convert.ToBase64String(hmac.Key);
+        var hash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
+        return (hash, salt);
+    }
+
+    public static bool VerifyPassword(string password, string storedHash, string storedSalt)
+    {
+        var saltBytes = Convert.FromBase64String(storedSalt);
+        using var hmac = new HMACSHA512(saltBytes);
+        var computedHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
+        return computedHash == storedHash;
     }
 
     public async Task<List<User>> GetAll()
@@ -31,11 +49,26 @@ public class UserService : BaseService
             .FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public async Task<User> Create(User user)
+    public async Task<User> Create(string username, string password)
     {
+        var (hash, salt) = HashPassword(password);
+        var user = new User
+        {
+            Username = username,
+            PasswordHash = hash,
+            PasswordSalt = salt
+        };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return user;
+    }
+
+    public async Task<User?> Authenticate(string username, string password)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        if (user == null) return null;
+
+        return VerifyPassword(password, user.PasswordHash, user.PasswordSalt) ? user : null;
     }
 
     public async Task<User?> Update(int id, User user)
@@ -48,6 +81,22 @@ public class UserService : BaseService
 
         await _context.SaveChangesAsync();
         return existing;
+    }
+
+    public async Task<bool> ChangePassword(int id, string currentPassword, string newPassword)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return false;
+
+        if (!VerifyPassword(currentPassword, user.PasswordHash, user.PasswordSalt))
+            return false;
+
+        var (hash, salt) = HashPassword(newPassword);
+        user.PasswordHash = hash;
+        user.PasswordSalt = salt;
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> Delete(int id)

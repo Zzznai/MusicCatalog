@@ -16,8 +16,7 @@ public class ArtistService : BaseService
             .Include(a => a.RecordLabel)
             .Include(a => a.Albums)
             .Include(a => a.Songs)
-            .Include(a => a.ArtistAwards)
-                .ThenInclude(aa => aa.Award)
+            .Include(a => a.Awards)
             .ToListAsync();
     }
 
@@ -27,16 +26,25 @@ public class ArtistService : BaseService
             .Include(a => a.RecordLabel)
             .Include(a => a.Albums)
             .Include(a => a.Songs)
-            .Include(a => a.ArtistAwards)
-                .ThenInclude(aa => aa.Award)
+            .Include(a => a.Awards)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<Artist> Create(Artist artist)
+    public async Task<Artist?> Create(Artist artist)
     {
+        var recordLabel = await _context.RecordLabels.FindAsync(artist.RecordLabelId);
+
+        if (recordLabel == null) return null;
+        
         _context.Artists.Add(artist);
         await _context.SaveChangesAsync();
-        return artist;
+        
+        return await _context.Artists
+            .Include(a => a.RecordLabel)
+            .Include(a => a.Albums)
+            .Include(a => a.Songs)
+            .Include(a => a.Awards)
+            .FirstOrDefaultAsync(a => a.Id == artist.Id);
     }
 
     public async Task<Artist?> Update(int id, Artist artist)
@@ -44,12 +52,21 @@ public class ArtistService : BaseService
         var existing = await _context.Artists.FindAsync(id);
         if (existing == null) return null;
 
+        var recordLabel = await _context.RecordLabels.FindAsync(artist.RecordLabelId);
+        if (recordLabel == null) return null;
+
         existing.StageName = artist.StageName;
         existing.Description = artist.Description;
         existing.RecordLabelId = artist.RecordLabelId;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.Artists
+            .Include(a => a.RecordLabel)
+            .Include(a => a.Albums)
+            .Include(a => a.Songs)
+            .Include(a => a.Awards)
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<bool> Delete(int id)

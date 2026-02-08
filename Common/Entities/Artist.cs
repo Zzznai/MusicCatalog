@@ -8,5 +8,5 @@ public class Artist : BaseEntity
     public RecordLabel RecordLabel { get; set; } = null!;
     public ICollection<Album> Albums { get; } = new List<Album>();
     public ICollection<Song> Songs { get; } = new List<Song>();
-    public ICollection<ArtistAward> ArtistAwards { get; } = new List<ArtistAward>();
+    public ICollection<Award> Awards { get; } = new List<Award>();
 }

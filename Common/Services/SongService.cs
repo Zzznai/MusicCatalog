@@ -46,11 +46,25 @@ public class SongService : BaseService
             .ToListAsync();
     }
 
-    public async Task<Song> Create(Song song)
+    public async Task<Song?> Create(Song song)
     {
+        var artist = await _context.Artists.FindAsync(song.ArtistId);
+        if (artist == null) return null;
+
+        if (song.AlbumId.HasValue)
+        {
+            var album = await _context.Albums.FindAsync(song.AlbumId);
+            if (album == null) return null;
+        }
+
         _context.Songs.Add(song);
         await _context.SaveChangesAsync();
-        return song;
+        
+        return await _context.Songs
+            .Include(s => s.Artist)
+            .Include(s => s.Album)
+            .Include(s => s.Genres)
+            .FirstOrDefaultAsync(s => s.Id == song.Id);
     }
 
     public async Task<Song?> Update(int id, Song song)
@@ -58,13 +72,27 @@ public class SongService : BaseService
         var existing = await _context.Songs.FindAsync(id);
         if (existing == null) return null;
 
+        var artist = await _context.Artists.FindAsync(song.ArtistId);
+        if (artist == null) return null;
+
+        if (song.AlbumId.HasValue)
+        {
+            var album = await _context.Albums.FindAsync(song.AlbumId);
+            if (album == null) return null;
+        }
+
         existing.Title = song.Title;
         existing.Duration = song.Duration;
         existing.ArtistId = song.ArtistId;
         existing.AlbumId = song.AlbumId;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.Songs
+            .Include(s => s.Artist)
+            .Include(s => s.Album)
+            .Include(s => s.Genres)
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<bool> Delete(int id)

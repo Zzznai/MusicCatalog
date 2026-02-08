@@ -8,10 +8,7 @@ public class ArtistResponse
     public string StageName { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int RecordLabelId { get; set; }
-    public RecordLabel RecordLabel { get; set; } = null!;
-    public ICollection<Album> Albums { get; set; } = [];
-    public ICollection<Song> Songs { get; set; } = [];
-    public ICollection<ArtistAward> ArtistAwards { get; set; } = [];
+    public string RecordLabelName { get; set; } = string.Empty;
 
     public static ArtistResponse FromEntity(Artist artist) => new()
     {
@@ -19,9 +16,6 @@ public class ArtistResponse
         StageName = artist.StageName,
         Description = artist.Description,
         RecordLabelId = artist.RecordLabelId,
-        RecordLabel = artist.RecordLabel,
-        Albums = artist.Albums,
-        Songs = artist.Songs,
-        ArtistAwards = artist.ArtistAwards
+        RecordLabelName = artist.RecordLabel.Name
     };
 }

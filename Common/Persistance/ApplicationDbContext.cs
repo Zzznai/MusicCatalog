@@ -12,7 +12,6 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Album> Albums { get; set; }
     public DbSet<Artist> Artists { get; set; }
-    public DbSet<ArtistAward> ArtistAwards { get; set; }
     public DbSet<Award> Awards { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Mood> Moods { get; set; }
@@ -25,17 +24,8 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<ArtistAward>()
-            .HasKey(aa => new { aa.ArtistId, aa.AwardId, aa.Year});
-
-        modelBuilder.Entity<ArtistAward>()
-            .HasOne(aa => aa.Artist)
-            .WithMany(a => a.ArtistAwards)
-            .HasForeignKey(aa => aa.ArtistId);
-
-        modelBuilder.Entity<ArtistAward>()
-            .HasOne(aa => aa.Award)
-            .WithMany(a => a.ArtistAwards)
-            .HasForeignKey(aa => aa.AwardId);
+        modelBuilder.Entity<Artist>()
+            .HasMany(a => a.Awards)
+            .WithMany(a => a.Artists);
     }
 }

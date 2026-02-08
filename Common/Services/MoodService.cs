@@ -24,11 +24,14 @@ public class MoodService : BaseService
             .FirstOrDefaultAsync(m => m.Id == id);
     }
 
-    public async Task<Mood> Create(Mood mood)
+    public async Task<Mood?> Create(Mood mood)
     {
         _context.Moods.Add(mood);
         await _context.SaveChangesAsync();
-        return mood;
+        
+        return await _context.Moods
+            .Include(m => m.Albums)
+            .FirstOrDefaultAsync(m => m.Id == mood.Id);
     }
 
     public async Task<Mood?> Update(int id, string name)
@@ -39,7 +42,10 @@ public class MoodService : BaseService
         existing.Name = name;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.Moods
+            .Include(m => m.Albums)
+            .FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<bool> Delete(int id)

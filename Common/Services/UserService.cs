@@ -47,7 +47,7 @@ public class UserService : BaseService
             .FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public async Task<User> Create(string username, string password)
+    public async Task<User?> Create(string username, string password)
     {
         var hash = HashPassword(password);
         var user = new User
@@ -58,7 +58,10 @@ public class UserService : BaseService
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return user;
+        
+        return await _context.Users
+            .Include(u => u.Playlists)
+            .FirstOrDefaultAsync(u => u.Id == user.Id);
     }
 
     public async Task<User?> Authenticate(string username, string password)

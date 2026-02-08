@@ -21,7 +21,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateGenreRequestValidator
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<ArtistService>();
-builder.Services.AddScoped<ArtistAwardService>();
 builder.Services.AddScoped<AwardService>();
 builder.Services.AddScoped<GenreService>();
 builder.Services.AddScoped<MoodService>();

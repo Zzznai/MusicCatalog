@@ -39,14 +39,14 @@ public class AwardController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create(CreateAwardRequest createAwardRequest)
     {
-        var award = await _awardService.Create(new Award { Name = createAwardRequest.Name });
+        var award = await _awardService.Create(new Award { Name = createAwardRequest.Name, Year = createAwardRequest.Year });
         return Ok(AwardResponse.FromEntity(award));
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult> Update(int id, UpdateAwardRequest updateAwardRequest)
     {
-        var award = await _awardService.Update(id, updateAwardRequest.Name);
+        var award = await _awardService.Update(id, updateAwardRequest.Name, updateAwardRequest.Year);
         if (award == null)
         {
             return NotFound();
@@ -68,4 +68,16 @@ public class AwardController : ControllerBase
             return NoContent();
         }
     }
+
+    [HttpPut("{awardId}/artist/{artistId}")]
+    public async Task<IActionResult> AddWinner(int awardId, int artistId)
+    {
+        var added = await _awardService.AddWinner(awardId, artistId);
+        if(!added) return NotFound();
+
+        var award = await _awardService.GetById(awardId);
+
+        return Ok(AwardResponse.FromEntity(award));
+    }
+
 }

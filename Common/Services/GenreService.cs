@@ -24,11 +24,14 @@ public class GenreService : BaseService
             .FirstOrDefaultAsync(g => g.Id == id);
     }
 
-    public async Task<Genre> Create(Genre genre)
+    public async Task<Genre?> Create(Genre genre)
     {
         _context.Genres.Add(genre);
         await _context.SaveChangesAsync();
-        return genre;
+        
+        return await _context.Genres
+            .Include(g => g.Songs)
+            .FirstOrDefaultAsync(g => g.Id == genre.Id);
     }
 
     public async Task<Genre?> Update(int id, String name)
@@ -39,7 +42,10 @@ public class GenreService : BaseService
         existing.Name = name;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.Genres
+            .Include(g => g.Songs)
+            .FirstOrDefaultAsync(g => g.Id == id);
     }
 
     public async Task<bool> Delete(int id)

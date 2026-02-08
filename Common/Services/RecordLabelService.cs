@@ -13,7 +13,6 @@ public class RecordLabelService : BaseService
     public async Task<List<RecordLabel>> GetAll()
     {
         return await _context.RecordLabels
-            .Include(r => r.Artists)
             .ToListAsync();
     }
 
@@ -24,11 +23,14 @@ public class RecordLabelService : BaseService
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public async Task<RecordLabel> Create(RecordLabel recordLabel)
+    public async Task<RecordLabel?> Create(RecordLabel recordLabel)
     {
         _context.RecordLabels.Add(recordLabel);
         await _context.SaveChangesAsync();
-        return recordLabel;
+        
+        return await _context.RecordLabels
+            .Include(r => r.Artists)
+            .FirstOrDefaultAsync(r => r.Id == recordLabel.Id);
     }
 
     public async Task<RecordLabel?> Update(int id, RecordLabel recordLabel)
@@ -41,7 +43,10 @@ public class RecordLabelService : BaseService
         existing.FoundedYear = recordLabel.FoundedYear;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.RecordLabels
+            .Include(r => r.Artists)
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<bool> Delete(int id)

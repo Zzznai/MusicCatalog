@@ -43,6 +43,7 @@ public class ArtistController : ControllerBase
             Description = createArtistRequest.Description,
             RecordLabelId = createArtistRequest.RecordLabelId
         });
+        if(artist == null) return NotFound();
         return Ok(ArtistResponse.FromEntity(artist));
     }
 

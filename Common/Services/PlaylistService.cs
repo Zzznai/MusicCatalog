@@ -34,11 +34,18 @@ public class PlaylistService : BaseService
             .ToListAsync();
     }
 
-    public async Task<Playlist> Create(Playlist playlist)
+    public async Task<Playlist?> Create(Playlist playlist)
     {
+        var user = await _context.Users.FindAsync(playlist.UserId);
+        if (user == null) return null;
+
         _context.Playlists.Add(playlist);
         await _context.SaveChangesAsync();
-        return playlist;
+        
+        return await _context.Playlists
+            .Include(p => p.User)
+            .Include(p => p.Songs)
+            .FirstOrDefaultAsync(p => p.Id == playlist.Id);
     }
 
     public async Task<Playlist?> Update(int id, Playlist playlist)
@@ -46,11 +53,18 @@ public class PlaylistService : BaseService
         var existing = await _context.Playlists.FindAsync(id);
         if (existing == null) return null;
 
+        var user = await _context.Users.FindAsync(playlist.UserId);
+        if (user == null) return null;
+
         existing.Name = playlist.Name;
         existing.UserId = playlist.UserId;
 
         await _context.SaveChangesAsync();
-        return existing;
+        
+        return await _context.Playlists
+            .Include(p => p.User)
+            .Include(p => p.Songs)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<bool> Delete(int id)

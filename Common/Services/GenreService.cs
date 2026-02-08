@@ -31,12 +31,12 @@ public class GenreService : BaseService
         return genre;
     }
 
-    public async Task<Genre?> Update(int id, Genre genre)
+    public async Task<Genre?> Update(int id, String name)
     {
         var existing = await _context.Genres.FindAsync(id);
         if (existing == null) return null;
 
-        existing.Name = genre.Name;
+        existing.Name = name;
 
         await _context.SaveChangesAsync();
         return existing;

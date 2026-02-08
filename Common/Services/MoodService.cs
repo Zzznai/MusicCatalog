@@ -31,12 +31,12 @@ public class MoodService : BaseService
         return mood;
     }
 
-    public async Task<Mood?> Update(int id, Mood mood)
+    public async Task<Mood?> Update(int id, string name)
     {
         var existing = await _context.Moods.FindAsync(id);
         if (existing == null) return null;
 
-        existing.Name = mood.Name;
+        existing.Name = name;
 
         await _context.SaveChangesAsync();
         return existing;

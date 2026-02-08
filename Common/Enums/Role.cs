@@ -2,6 +2,6 @@ namespace Common.Enums;
 
 public enum Role
 {
-    User,
+    Consumer,
     Admin
 }

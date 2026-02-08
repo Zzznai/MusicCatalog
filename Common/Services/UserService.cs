@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using MusicCatalog.Common.Entities;
 using MusicCatalog.Common.Persistance;
@@ -12,19 +13,16 @@ public class UserService : BaseService
     {
     }
 
-    public static (string hash, string salt) HashPassword(string password)
+    public static string HashPassword(string password)
     {
-        using var hmac = new HMACSHA512();
-        var salt = Convert.ToBase64String(hmac.Key);
-        var hash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
-        return (hash, salt);
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+        return Convert.ToBase64String(bytes);
     }
 
-    public static bool VerifyPassword(string password, string storedHash, string storedSalt)
+    public static bool VerifyPassword(string password, string storedHash)
     {
-        var saltBytes = Convert.FromBase64String(storedSalt);
-        using var hmac = new HMACSHA512(saltBytes);
-        var computedHash = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(password)));
+        var computedHash = HashPassword(password);
         return computedHash == storedHash;
     }
 
@@ -51,12 +49,12 @@ public class UserService : BaseService
 
     public async Task<User> Create(string username, string password)
     {
-        var (hash, salt) = HashPassword(password);
+        var hash = HashPassword(password);
         var user = new User
         {
             Username = username,
             PasswordHash = hash,
-            PasswordSalt = salt
+            Role = Role.Consumer
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
@@ -68,35 +66,7 @@ public class UserService : BaseService
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (user == null) return null;
 
-        return VerifyPassword(password, user.PasswordHash, user.PasswordSalt) ? user : null;
-    }
-
-    public async Task<User?> Update(int id, User user)
-    {
-        var existing = await _context.Users.FindAsync(id);
-        if (existing == null) return null;
-
-        existing.Username = user.Username;
-        existing.Role = user.Role;
-
-        await _context.SaveChangesAsync();
-        return existing;
-    }
-
-    public async Task<bool> ChangePassword(int id, string currentPassword, string newPassword)
-    {
-        var user = await _context.Users.FindAsync(id);
-        if (user == null) return false;
-
-        if (!VerifyPassword(currentPassword, user.PasswordHash, user.PasswordSalt))
-            return false;
-
-        var (hash, salt) = HashPassword(newPassword);
-        user.PasswordHash = hash;
-        user.PasswordSalt = salt;
-
-        await _context.SaveChangesAsync();
-        return true;
+        return VerifyPassword(password, user.PasswordHash) ? user : null;
     }
 
     public async Task<bool> Delete(int id)

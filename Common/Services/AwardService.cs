@@ -33,12 +33,12 @@ public class AwardService : BaseService
         return award;
     }
 
-    public async Task<Award?> Update(int id, Award award)
+    public async Task<Award?> Update(int id, string name)
     {
         var existing = await _context.Awards.FindAsync(id);
         if (existing == null) return null;
 
-        existing.Name = award.Name;
+        existing.Name = name;
 
         await _context.SaveChangesAsync();
         return existing;

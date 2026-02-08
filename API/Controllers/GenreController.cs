@@ -1,54 +1,73 @@
-using Microsoft.AspNetCore.Mvc;
-using MusicCatalog.Common.Entities;
-using MusicCatalog.Common.Services;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using MusicCatalog.Api.DTOs;
+    using MusicCatalog.Api.DTOs.Requests;
+    using MusicCatalog.Api.DTOs.Responses;
+    using MusicCatalog.Common.Entities;
+    using MusicCatalog.Common.Services;
 
-namespace MusicCatalog.Api.Controllers;
+    namespace MusicCatalog.Api.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class GenreController : ControllerBase
-{
-    private readonly GenreService _genreService;
-
-    public GenreController(GenreService genreService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class GenreController : ControllerBase
     {
-        _genreService = genreService;
-    }
+        private readonly GenreService _genreService;
 
-    [HttpGet]
-    public async Task<ActionResult<List<Genre>>> GetAll()
-    {
-        return await _genreService.GetAll();
-    }
+        public GenreController(GenreService genreService)
+        {
+            _genreService = genreService;
+        }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Genre>> GetById(int id)
-    {
-        var genre = await _genreService.GetById(id);
-        if (genre == null) return NotFound();
-        return genre;
-    }
+        [HttpGet]
+        public async Task<ActionResult> GetAll()
+        {
+            var genres = await _genreService.GetAll();
+            var response = genres.Select(GenreResponse.FromEntity);
+            return Ok(response);
+        }
 
-    [HttpPost]
-    public async Task<ActionResult<Genre>> Create(Genre genre)
-    {
-        var created = await _genreService.Create(genre);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var genre = await _genreService.GetById(id);
+            if (genre == null)
+            {
+                return NotFound();
+            }
+            return Ok(GenreResponse.FromEntity(genre));
+        }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Genre>> Update(int id, Genre genre)
-    {
-        var updated = await _genreService.Update(id, genre);
-        if (updated == null) return NotFound();
-        return updated;
-    }
+        [HttpPost]
+        public async Task<ActionResult> Create(CreateGenreRequest createGenreRequest)
+        {
+            var genre = await _genreService.Create(new Genre { Name = createGenreRequest.Name });
+            return Ok(GenreResponse.FromEntity(genre));
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var deleted = await _genreService.Delete(id);
-        if (!deleted) return NotFound();
-        return NoContent();
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, UpdateGenreRequest updateGenreRequest)
+        {
+            var genre = await _genreService.Update(id, updateGenreRequest.Name);
+            if (genre == null)
+            {
+                return NotFound();
+            }
+            return Ok(GenreResponse.FromEntity(genre));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var deleted = await _genreService.Delete(id);
+
+            if(deleted == false)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
     }
-}

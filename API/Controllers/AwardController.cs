@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicCatalog.Api.DTOs.Requests;
 using MusicCatalog.Api.DTOs.Responses;
@@ -18,6 +19,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult> GetAll()
     {
         var awards = await _awardService.GetAll();
@@ -26,6 +28,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var award = await _awardService.GetById(id);
@@ -37,6 +40,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Create(CreateAwardRequest createAwardRequest)
     {
         var award = await _awardService.Create(new Award { Name = createAwardRequest.Name, Year = createAwardRequest.Year });
@@ -44,6 +48,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Update(int id, UpdateAwardRequest updateAwardRequest)
     {
         var award = await _awardService.Update(id, updateAwardRequest.Name, updateAwardRequest.Year);
@@ -55,6 +60,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(int id)
     {
         var deleted = await _awardService.Delete(id);
@@ -70,6 +76,7 @@ public class AwardController : ControllerBase
     }
 
     [HttpPut("{awardId}/artist/{artistId}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddWinner(int awardId, int artistId)
     {
         var added = await _awardService.AddWinner(awardId, artistId);

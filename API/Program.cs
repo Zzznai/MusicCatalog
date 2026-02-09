@@ -1,11 +1,14 @@
 using System.Text;
+using Common.Enums;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MusicCatalog.Api.Services;
 using MusicCatalog.Api.Validators;
+using MusicCatalog.Common.Entities;
 using MusicCatalog.Common.Persistance;
 using MusicCatalog.Common.Services;
 
@@ -66,5 +69,26 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<ApplicationDbContext>();
+
+    if (!db.Users.Any(u => u.Username == "Admin"))
+    {
+        var admin = new User
+        {
+            Username = "Admin",
+            Role = Role.Admin
+        };
+
+        var hash = UserService.HashPassword("Admin");
+        admin.PasswordHash = hash;
+
+        db.Users.Add(admin);
+        db.SaveChanges();
+    }
+}
 
 app.Run();

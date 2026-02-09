@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicCatalog.Api.DTOs.Requests;
 using MusicCatalog.Api.DTOs.Responses;
@@ -18,6 +19,7 @@ public class ArtistController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var artists = await _artistService.GetAll();
@@ -26,6 +28,7 @@ public class ArtistController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var artist = await _artistService.GetById(id);
@@ -35,6 +38,7 @@ public class ArtistController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateArtistRequest createArtistRequest)
     {
         var artist = await _artistService.Create(new Artist
@@ -48,6 +52,7 @@ public class ArtistController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, UpdateArtistRequest updateArtistRequest)
     {
         var artist = await _artistService.Update(id, new Artist
@@ -63,6 +68,7 @@ public class ArtistController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _artistService.Delete(id);

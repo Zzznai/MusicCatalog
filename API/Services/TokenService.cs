@@ -20,10 +20,10 @@ public class TokenService
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         JwtSecurityToken token = new JwtSecurityToken(
-            issuer: "fmi",
-            audience: "users",
+            issuer: "MusicCalalog",
+            audience: "Users",
             claims: claims,
-            expires: DateTime.Now.AddMinutes(10),
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: cred
         );
         string tokenData = new JwtSecurityTokenHandler()

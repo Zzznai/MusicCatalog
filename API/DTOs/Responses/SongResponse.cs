@@ -9,6 +9,7 @@ public class SongResponse
     public string ArtistName { get; set; } = string.Empty;
     public int? AlbumId { get; set; }
     public string? AlbumName { get; set; }
+    public List<string> Genres { get; set; }
 
     public static SongResponse FromEntity(MusicCatalog.Common.Entities.Song song) => new()
     {
@@ -18,6 +19,7 @@ public class SongResponse
         ArtistId = song.ArtistId,
         ArtistName = song.Artist?.StageName ?? string.Empty,
         AlbumId = song.AlbumId,
-        AlbumName = song.Album?.Name
+        AlbumName = song.Album?.Name,
+        Genres = song.Genres?.Select(g => g.Name).ToList()
     };
 }

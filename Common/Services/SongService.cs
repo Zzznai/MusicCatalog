@@ -113,7 +113,7 @@ public class SongService : BaseService
         
         var genre = await _context.Genres.FindAsync(genreId);
         
-        if (song == null || genre == null) return false;
+        if (song == null || genre == null || song.Genres.Any(g => g.Id == genreId)) return false;
 
         song.Genres.Add(genre);
         await _context.SaveChangesAsync();
@@ -131,8 +131,13 @@ public class SongService : BaseService
         var genre = song.Genres.FirstOrDefault(g => g.Id == genreId);
         if (genre == null) return false;
 
-        song.Genres.Remove(genre);
-        await _context.SaveChangesAsync();
-        return true;
+        if(song.Genres.Any(g=>g.Id == genreId))
+        {
+            song.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
     }
 }

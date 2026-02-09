@@ -20,6 +20,7 @@
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult> GetAll()
         {
             var genres = await _genreService.GetAll();
@@ -28,6 +29,7 @@
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var genre = await _genreService.GetById(id);
@@ -39,6 +41,7 @@
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Create(CreateGenreRequest createGenreRequest)
         {
             var genre = await _genreService.Create(new Genre { Name = createGenreRequest.Name });
@@ -46,6 +49,7 @@
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Update(int id, UpdateGenreRequest updateGenreRequest)
         {
             var genre = await _genreService.Update(id, updateGenreRequest.Name);
@@ -57,6 +61,7 @@
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             var deleted = await _genreService.Delete(id);

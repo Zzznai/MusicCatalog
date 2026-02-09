@@ -12,6 +12,8 @@ public class AlbumResponse
 
     public List<string> Moods {get;set;}
 
+    public List<string> Songs {get; set;}
+
     public static AlbumResponse FromEntity(MusicCatalog.Common.Entities.Album album) => new()
     {
         Id = album.Id,
@@ -19,6 +21,7 @@ public class AlbumResponse
         Description = album.Description,
         ArtistId = album.ArtistId,
         ArtistName = album.Artist?.StageName ?? string.Empty,
+        Songs = album.Songs?.Select(s => $"{s.Title} - {s.Duration}").ToList(),
         Moods = album.Moods?.Select(m=>m.Name).ToList()
     };
 }

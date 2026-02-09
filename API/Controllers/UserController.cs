@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicCatalog.Api.DTOs.Requests;
 using MusicCatalog.Api.DTOs.Responses;
@@ -19,6 +20,7 @@ public class UserController:ControllerBase
 
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var users = await _userService.GetAll();
@@ -29,6 +31,7 @@ public class UserController:ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var user = await _userService.GetById(id);
@@ -41,6 +44,7 @@ public class UserController:ControllerBase
     }
 
     [HttpGet("username/{username}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetByUsername(string username)
     {
         var user = await _userService.GetByUsername(username);
@@ -51,6 +55,7 @@ public class UserController:ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateUserRequest createUserRequest)
     {
         var user = await _userService.Create(createUserRequest.Username, createUserRequest.Password);
@@ -59,6 +64,7 @@ public class UserController:ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _userService.Delete(id);

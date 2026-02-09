@@ -3,6 +3,7 @@ using MusicCatalog.Api.DTOs.Responses;
 using MusicCatalog.Common.Services;
 using MusicCatalog.Common.Entities;
 using MusicCatalog.Api.DTOs.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MusicCatalog.Api.Controllers;
 
@@ -18,6 +19,7 @@ public class RecordLabelController:ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var labels = await _recordLabelService.GetAll();
@@ -26,6 +28,7 @@ public class RecordLabelController:ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var label = await _recordLabelService.GetById(id);
@@ -37,6 +40,7 @@ public class RecordLabelController:ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateRecordLabelRequest createRecordLabelRequest)
     {
         var label = await _recordLabelService.Create(new RecordLabel
@@ -49,6 +53,7 @@ public class RecordLabelController:ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, UpdateRecordLabelRequest updateRecordLabelRequest)
     {
         var label = await _recordLabelService.Update(id, new RecordLabel
@@ -66,6 +71,7 @@ public class RecordLabelController:ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _recordLabelService.Delete(id);

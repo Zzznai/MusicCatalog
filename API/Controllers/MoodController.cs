@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicCatalog.Api.DTOs.Requests;
 using MusicCatalog.Api.DTOs.Responses;
@@ -16,6 +17,7 @@ public class MoodController:ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var moods = await _moodService.GetAll();
@@ -24,6 +26,7 @@ public class MoodController:ControllerBase
     }
 
     [HttpGet("{Id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var mood = await _moodService.GetById(id);
@@ -33,6 +36,7 @@ public class MoodController:ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateMoodRequest createMoodRequest)
     {
         var mood = await _moodService.Create(new Mood { Name = createMoodRequest.Name });
@@ -41,6 +45,7 @@ public class MoodController:ControllerBase
 
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, UpdateMoodRequest updateMoodRequest)
     {
         var mood = await _moodService.Update(id, updateMoodRequest.Name);
@@ -50,6 +55,7 @@ public class MoodController:ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete (int id)
     {
 

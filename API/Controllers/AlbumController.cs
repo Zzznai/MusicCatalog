@@ -1,4 +1,5 @@
 using System.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicCatalog.Api.DTOs.Requests;
 using MusicCatalog.Api.DTOs.Responses;
@@ -19,6 +20,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
         var result = await _albumService.GetAll();
@@ -28,6 +30,7 @@ public class AlbumController:ControllerBase
 
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var album = await _albumService.GetById(id);
@@ -37,6 +40,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateAlbumRequest createAlbumRequest)
     {
         var album = await _albumService.Create(new Album
@@ -54,6 +58,7 @@ public class AlbumController:ControllerBase
 
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, UpdateAlbumRequest updateAlbumRequest)
     {
         var album = await _albumService.Update(id, new Album
@@ -71,6 +76,7 @@ public class AlbumController:ControllerBase
 
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var deleted = await _albumService.Delete(id);
@@ -82,6 +88,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpPut("{albumId}/song/{songId}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddSong(int albumId, int songId)
     {
         var added = await _albumService.AddSong(albumId, songId);
@@ -95,6 +102,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpDelete("{albumId}/song/{songId}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RemoveSong(int albumId, int songId)
     {
         var deleted = await _albumService.RemoveSong(albumId, songId);
@@ -108,6 +116,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpPut("{albumId}/mood/{moodId}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddMood(int albumId, int moodId)
     {
         var added = await _albumService.AddMood(albumId, moodId);
@@ -121,6 +130,7 @@ public class AlbumController:ControllerBase
     }
 
     [HttpDelete("{albumId}/mood/{moodId}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RemoveMood(int albumId, int moodId)
     {
         var deleted = await _albumService.RemoveMood(albumId, moodId);

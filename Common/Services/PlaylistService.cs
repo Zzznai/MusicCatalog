@@ -15,6 +15,7 @@ public class PlaylistService : BaseService
         return await _context.Playlists
             .Include(p => p.User)
             .Include(p => p.Songs)
+            .ThenInclude(s=>s.Artist)
             .ToListAsync();
     }
 
@@ -23,6 +24,7 @@ public class PlaylistService : BaseService
         return await _context.Playlists
             .Include(p => p.User)
             .Include(p => p.Songs)
+            .ThenInclude(s=>s.Artist)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -30,7 +32,18 @@ public class PlaylistService : BaseService
     {
         return await _context.Playlists
             .Include(p => p.Songs)
+            .ThenInclude(s=>s.Artist)
             .Where(p => p.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Playlist>> GetByUsername(string username)
+    {
+        return await _context.Playlists
+            .Include(p => p.User)
+            .Include(p => p.Songs)
+            .ThenInclude(s => s.Artist)
+            .Where(p => p.User.Username == username)
             .ToListAsync();
     }
 
@@ -45,60 +58,69 @@ public class PlaylistService : BaseService
         return await _context.Playlists
             .Include(p => p.User)
             .Include(p => p.Songs)
+            .ThenInclude(s=>s.Artist)
             .FirstOrDefaultAsync(p => p.Id == playlist.Id);
     }
 
-    public async Task<Playlist?> Update(int id, Playlist playlist)
+    public async Task<Playlist?> Update(int id, int userId, string name)
     {
         var existing = await _context.Playlists.FindAsync(id);
         if (existing == null) return null;
 
-        var user = await _context.Users.FindAsync(playlist.UserId);
-        if (user == null) return null;
+        if (existing.UserId != userId) return null;
 
-        existing.Name = playlist.Name;
-        existing.UserId = playlist.UserId;
+        existing.Name = name;
 
         await _context.SaveChangesAsync();
         
         return await _context.Playlists
             .Include(p => p.User)
             .Include(p => p.Songs)
+            .ThenInclude(s=>s.Artist)
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id, int userId)
     {
         var playlist = await _context.Playlists.FindAsync(id);
         if (playlist == null) return false;
+
+        if (playlist.UserId != userId) return false;
 
         _context.Playlists.Remove(playlist);
         await _context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> AddSong(int playlistId, int songId)
-    {
-        var playlist = await _context.Playlists
-            .Include(p => p.Songs)
-            .FirstOrDefaultAsync(p => p.Id == playlistId);
-        
-        var song = await _context.Songs.FindAsync(songId);
-        
-        if (playlist == null || song == null) return false;
-
-        playlist.Songs.Add(song);
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> RemoveSong(int playlistId, int songId)
+    public async Task<bool> AddSong(int playlistId, int userId, int songId)
     {
         var playlist = await _context.Playlists
             .Include(p => p.Songs)
             .FirstOrDefaultAsync(p => p.Id == playlistId);
         
         if (playlist == null) return false;
+
+        if (playlist.UserId != userId) return false;
+
+        if (playlist.Songs.Any(s => s.Id == songId)) return false;
+
+        var song = await _context.Songs.FindAsync(songId);
+        if (song == null) return false;
+
+        playlist.Songs.Add(song);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> RemoveSong(int playlistId, int userId, int songId)
+    {
+        var playlist = await _context.Playlists
+            .Include(p => p.Songs)
+            .FirstOrDefaultAsync(p => p.Id == playlistId);
+        
+        if (playlist == null) return false;
+
+        if (playlist.UserId != userId) return false;
 
         var song = playlist.Songs.FirstOrDefault(s => s.Id == songId);
         if (song == null) return false;

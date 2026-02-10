@@ -96,21 +96,28 @@ public string Title { get; set; } = string.Empty;
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddGenre(int songId, int genreId)
     {
-        var added = await _songService.AddGenre(songId, genreId);
+        var song = await _songService.GetById(songId);
+        if (song == null) return NotFound();
+        if (SongService.HasGenre(song, genreId))
+            return BadRequest("Song already has this genre.");
 
+        var added = await _songService.AddGenre(songId, genreId);
         if(added == false) return NotFound();
 
-        var song = await _songService.GetById(songId);
-
+        song = await _songService.GetById(songId);
         return Ok(SongResponse.FromEntity(song));
     }
 
     [HttpDelete("{songId}/genre/{genreId}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> RemoveGenre(int songid, int genreId)
+    public async Task<IActionResult> RemoveGenre(int songId, int genreId)
     {
-        var removed = await _songService.RemoveGenre(songid, genreId);
+        var song = await _songService.GetById(songId);
+        if (song == null) return NotFound();
+        if (!SongService.HasGenre(song, genreId))
+            return BadRequest("Song does not have this genre.");
 
+        var removed = await _songService.RemoveGenre(songId, genreId);
         if(removed == false) return NotFound();
 
         return NoContent();

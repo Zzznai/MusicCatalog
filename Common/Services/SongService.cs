@@ -10,6 +10,9 @@ public class SongService : BaseService
     {
     }
 
+    public static bool HasGenre(Song song, int genreId)
+        => song.Genres.Any(g => g.Id == genreId);
+
     public async Task<List<Song>> GetAll()
     {
         return await _context.Songs

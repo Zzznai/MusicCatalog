@@ -10,6 +10,9 @@ public class PlaylistService : BaseService
     {
     }
 
+    public static bool HasSong(Playlist playlist, int songId)
+        => playlist.Songs.Any(s => s.Id == songId);
+
     public async Task<List<Playlist>> GetAll()
     {
         return await _context.Playlists
@@ -31,6 +34,7 @@ public class PlaylistService : BaseService
     public async Task<List<Playlist>> GetByUserId(int userId)
     {
         return await _context.Playlists
+            .Include(p => p.User)
             .Include(p => p.Songs)
             .ThenInclude(s=>s.Artist)
             .Where(p => p.UserId == userId)

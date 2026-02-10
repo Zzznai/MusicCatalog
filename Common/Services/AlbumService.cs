@@ -11,6 +11,12 @@ public class AlbumService : BaseService
     {
     }
 
+    public static bool HasSong(Album album, int songId)
+        => album.Songs.Any(s => s.Id == songId);
+
+    public static bool HasMood(Album album, int moodId)
+        => album.Moods.Any(m => m.Id == moodId);
+
     public async Task<List<Album>> GetAll()
     {
         return await _context.Albums.Include(a=>a.Songs).Include(a=>a.Moods).Include(a=>a.Artist).
@@ -145,5 +151,4 @@ public class AlbumService : BaseService
        
     }
  
-    
 }

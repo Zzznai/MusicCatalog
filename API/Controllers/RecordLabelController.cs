@@ -46,9 +46,10 @@ public class RecordLabelController:ControllerBase
         var label = await _recordLabelService.Create(new RecordLabel
         {
             Name = createRecordLabelRequest.Name,
-            BasedIn = createRecordLabelRequest.BasedIn,
+            CountryId = createRecordLabelRequest.CountryId,
             FoundedYear = createRecordLabelRequest.FoundedYear
         });
+        if (label == null) return NotFound();
         return Ok(RecordLabelResponse.FromEntity(label));
     }
 
@@ -59,7 +60,7 @@ public class RecordLabelController:ControllerBase
         var label = await _recordLabelService.Update(id, new RecordLabel
         {
             Name = updateRecordLabelRequest.Name,
-            BasedIn = updateRecordLabelRequest.BasedIn,
+            CountryId = updateRecordLabelRequest.CountryId,
             FoundedYear = updateRecordLabelRequest.FoundedYear
         });
 

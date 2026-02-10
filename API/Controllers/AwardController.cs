@@ -87,4 +87,14 @@ public class AwardController : ControllerBase
         return Ok(AwardResponse.FromEntity(award));
     }
 
+    [HttpDelete("{awardId}/artist/{artistId}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RemoveWinner(int awardId, int artistId)
+    {
+        var removed = await _awardService.RemoveWinner(awardId, artistId);
+        if (!removed) return NotFound();
+
+        return NoContent();
+    }
+
 }

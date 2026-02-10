@@ -25,6 +25,7 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<ArtistService>();
 builder.Services.AddScoped<AwardService>();
+builder.Services.AddScoped<CountryService>();
 builder.Services.AddScoped<GenreService>();
 builder.Services.AddScoped<MoodService>();
 builder.Services.AddScoped<PlaylistService>();

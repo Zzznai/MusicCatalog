@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Album> Albums { get; set; }
     public DbSet<Artist> Artists { get; set; }
     public DbSet<Award> Awards { get; set; }
+    public DbSet<Country> Countries { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<Mood> Moods { get; set; }
     public DbSet<Playlist> Playlists { get; set; }

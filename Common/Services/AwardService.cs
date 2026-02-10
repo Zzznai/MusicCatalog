@@ -77,4 +77,21 @@ public class AwardService : BaseService
 
         return true;
     }
+
+    public async Task<bool> RemoveWinner(int awardId, int artistId)
+    {
+        var award = await _context.Awards
+            .Include(a => a.Artists)
+            .FirstOrDefaultAsync(aw => aw.Id == awardId);
+
+        if (award == null) return false;
+
+        var artist = award.Artists.FirstOrDefault(a => a.Id == artistId);
+        if (artist == null) return false;
+
+        award.Artists.Remove(artist);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

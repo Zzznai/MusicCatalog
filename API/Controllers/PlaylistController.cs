@@ -114,13 +114,16 @@ public class PlaylistController:ControllerBase
     {
         var userId = int.Parse(User.FindFirst("loggedUserId")!.Value);
 
-        var added = await _playlistService.AddSong(playlistId, userId, songId);
+        var playlist = await _playlistService.GetById(playlistId);
+        if (playlist == null) return NotFound();
+        if (PlaylistService.HasSong(playlist, songId))
+            return BadRequest("Playlist already contains this song.");
 
+        var added = await _playlistService.AddSong(playlistId, userId, songId);
         if(added == false) return NotFound();
 
         var currentPlaylist = await _playlistService.GetById(playlistId);
-
-       return Ok(PlaylistResponse.FromEntity(currentPlaylist));
+        return Ok(PlaylistResponse.FromEntity(currentPlaylist));
     }
 
     [HttpDelete("{playlistId}/song/{songId}")]
@@ -129,8 +132,12 @@ public class PlaylistController:ControllerBase
     {
         var userId = int.Parse(User.FindFirst("loggedUserId")!.Value);
 
-        var removed = await _playlistService.RemoveSong(playlistId, userId, songId);
+        var playlist = await _playlistService.GetById(playlistId);
+        if (playlist == null) return NotFound();
+        if (!PlaylistService.HasSong(playlist, songId))
+            return BadRequest("Playlist does not contain this song.");
 
+        var removed = await _playlistService.RemoveSong(playlistId, userId, songId);
         if(removed == false) return NotFound();
 
         return NoContent();

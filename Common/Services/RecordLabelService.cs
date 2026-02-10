@@ -13,22 +13,28 @@ public class RecordLabelService : BaseService
     public async Task<List<RecordLabel>> GetAll()
     {
         return await _context.RecordLabels
+            .Include(r => r.Country)
             .ToListAsync();
     }
 
     public async Task<RecordLabel?> GetById(int id)
     {
         return await _context.RecordLabels
+            .Include(r => r.Country)
             .Include(r => r.Artists)
             .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<RecordLabel?> Create(RecordLabel recordLabel)
     {
+        var country = await _context.Countries.FindAsync(recordLabel.CountryId);
+        if (country == null) return null;
+
         _context.RecordLabels.Add(recordLabel);
         await _context.SaveChangesAsync();
         
         return await _context.RecordLabels
+            .Include(r => r.Country)
             .Include(r => r.Artists)
             .FirstOrDefaultAsync(r => r.Id == recordLabel.Id);
     }
@@ -38,13 +44,17 @@ public class RecordLabelService : BaseService
         var existing = await _context.RecordLabels.FindAsync(id);
         if (existing == null) return null;
 
+        var country = await _context.Countries.FindAsync(recordLabel.CountryId);
+        if (country == null) return null;
+
         existing.Name = recordLabel.Name;
-        existing.BasedIn = recordLabel.BasedIn;
+        existing.CountryId = recordLabel.CountryId;
         existing.FoundedYear = recordLabel.FoundedYear;
 
         await _context.SaveChangesAsync();
         
         return await _context.RecordLabels
+            .Include(r => r.Country)
             .Include(r => r.Artists)
             .FirstOrDefaultAsync(r => r.Id == id);
     }

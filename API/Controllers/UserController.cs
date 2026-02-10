@@ -58,6 +58,9 @@ public class UserController:ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Create(CreateUserRequest createUserRequest)
     {
+        if (await _userService.UsernameExists(createUserRequest.Username))
+            return BadRequest("Username already exists.");
+
         var user = await _userService.Create(createUserRequest.Username, createUserRequest.Password);
 
         return Ok(UserResponse.FromEntity(user));

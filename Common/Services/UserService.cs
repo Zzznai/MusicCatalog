@@ -13,6 +13,9 @@ public class UserService : BaseService
     {
     }
 
+    public async Task<bool> UsernameExists(string username)
+    => await _context.Users.AnyAsync(u => u.Username == username);
+
     public static string HashPassword(string password)
     {
         using var sha256 = SHA256.Create();

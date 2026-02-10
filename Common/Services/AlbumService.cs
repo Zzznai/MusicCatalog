@@ -81,7 +81,6 @@ public class AlbumService : BaseService
     public async Task<bool> AddSong(int albumId, int songId)
     {
         var album = await _context.Albums.Include(a=>a.Songs).FirstOrDefaultAsync(a=>a.Id==albumId);
-        if(album == null) return false;
 
         var song = await _context.Songs.FindAsync(songId);
         if(song == null) return false;
@@ -98,7 +97,6 @@ public class AlbumService : BaseService
     public async Task<bool> RemoveSong(int albumId, int songId)
     {
         var album = await _context.Albums.Include(a=>a.Songs).FirstOrDefaultAsync(a=>a.Id==albumId);
-        if(album == null) return false;
 
         var song = await _context.Songs.FindAsync(songId);
         if(song == null) return false;
@@ -118,7 +116,6 @@ public class AlbumService : BaseService
     public async Task<bool> AddMood(int albumId, int moodId)
     {
         var album = await _context.Albums.Include(a=>a.Moods).FirstOrDefaultAsync(a=>a.Id==albumId);
-        if(album == null) return false;
 
         var mood = await _context.Moods.FindAsync(moodId);
         if(mood == null) return false;
@@ -133,7 +130,6 @@ public class AlbumService : BaseService
     public async Task<bool> RemoveMood(int albumId, int moodId)
     {
         var album = await _context.Albums.Include(a=>a.Moods).FirstOrDefaultAsync(a=>a.Id==albumId);
-        if(album == null) return false;
 
         var mood = await _context.Moods.FindAsync(moodId);
         if(mood == null) return false;

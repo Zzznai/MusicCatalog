@@ -68,8 +68,6 @@ public class AwardService : BaseService
             .Include(a=>a.Artists)
             .FirstOrDefaultAsync(aw=>aw.Id == awardId);
 
-        if (award == null) return false;
-
         var artist = await _context.Artists.FindAsync(artistId);
         if(artist == null) return false;
 
@@ -85,8 +83,6 @@ public class AwardService : BaseService
         var award = await _context.Awards
             .Include(a => a.Artists)
             .FirstOrDefaultAsync(aw => aw.Id == awardId);
-
-        if (award == null) return false;
 
         var artist = award.Artists.FirstOrDefault(a => a.Id == artistId);
         if (artist == null) return false;

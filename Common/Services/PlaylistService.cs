@@ -101,8 +101,6 @@ public class PlaylistService : BaseService
         var playlist = await _context.Playlists
             .Include(p => p.Songs)
             .FirstOrDefaultAsync(p => p.Id == playlistId);
-        
-        if (playlist == null) return false;
 
         if (playlist.UserId != userId) return false;
 
@@ -119,8 +117,6 @@ public class PlaylistService : BaseService
         var playlist = await _context.Playlists
             .Include(p => p.Songs)
             .FirstOrDefaultAsync(p => p.Id == playlistId);
-        
-        if (playlist == null) return false;
 
         if (playlist.UserId != userId) return false;
 

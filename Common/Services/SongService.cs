@@ -116,7 +116,7 @@ public class SongService : BaseService
         
         var genre = await _context.Genres.FindAsync(genreId);
         
-        if (song == null || genre == null || song.Genres.Any(g => g.Id == genreId)) return false;
+        if (song == null || genre == null) return false;
 
         song.Genres.Add(genre);
         await _context.SaveChangesAsync();

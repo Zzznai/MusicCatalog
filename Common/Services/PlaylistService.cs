@@ -106,8 +106,6 @@ public class PlaylistService : BaseService
 
         if (playlist.UserId != userId) return false;
 
-        if (playlist.Songs.Any(s => s.Id == songId)) return false;
-
         var song = await _context.Songs.FindAsync(songId);
         if (song == null) return false;
 
@@ -127,7 +125,6 @@ public class PlaylistService : BaseService
         if (playlist.UserId != userId) return false;
 
         var song = playlist.Songs.FirstOrDefault(s => s.Id == songId);
-        if (song == null) return false;
 
         playlist.Songs.Remove(song);
         await _context.SaveChangesAsync();

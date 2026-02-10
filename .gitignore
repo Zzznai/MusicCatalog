@@ -82,3 +82,4 @@ appsettings.*.json
 
 # Publish output
 publish/
+PRESENTATION_GUIDE.md

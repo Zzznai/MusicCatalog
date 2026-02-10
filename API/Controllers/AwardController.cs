@@ -79,11 +79,15 @@ public class AwardController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddWinner(int awardId, int artistId)
     {
-        var added = await _awardService.AddWinner(awardId, artistId);
-        if(!added) return NotFound();
-
         var award = await _awardService.GetById(awardId);
+        if (award == null) return NotFound();
+        if (AwardService.HasArtist(award, artistId))
+            return BadRequest("Award already has this artist.");
 
+        var added = await _awardService.AddWinner(awardId, artistId);
+        if (!added) return NotFound();
+
+        award = await _awardService.GetById(awardId);
         return Ok(AwardResponse.FromEntity(award));
     }
 
@@ -91,6 +95,11 @@ public class AwardController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> RemoveWinner(int awardId, int artistId)
     {
+        var award = await _awardService.GetById(awardId);
+        if (award == null) return NotFound();
+        if (!AwardService.HasArtist(award, artistId))
+            return BadRequest("Award does not have this artist.");
+
         var removed = await _awardService.RemoveWinner(awardId, artistId);
         if (!removed) return NotFound();
 

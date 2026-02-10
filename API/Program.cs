@@ -14,8 +14,10 @@ using MusicCatalog.Common.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = "Server=(localdb)\\mssqllocaldb;Database=MusicCatalogDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    options.UseSqlServer(connectionString,
         b => b.MigrationsAssembly("MusicCatalog.Api")));
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -33,10 +35,6 @@ builder.Services.AddScoped<RecordLabelService>();
 builder.Services.AddScoped<SongService>();
 builder.Services.AddScoped<UserService>();
 
-var jwtKey = builder.Configuration["Jwt:Key"]!;
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
-var jwtAudience = builder.Configuration["Jwt:Audience"]!;
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,9 +48,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtIssuer,
-        ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey))
+        ValidIssuer = "MusicCalalog",
+        ValidAudience = "Users",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("!Password123!Password123!Password123"))
     };
 });
 
@@ -60,13 +58,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
+app.MapOpenApi();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

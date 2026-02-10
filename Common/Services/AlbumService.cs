@@ -123,8 +123,6 @@ public class AlbumService : BaseService
         var mood = await _context.Moods.FindAsync(moodId);
         if(mood == null) return false;
 
-        if(album.Moods.Any(m=>m.Id == moodId)) return false;
-
         album.Moods.Add(mood);
 
         await _context.SaveChangesAsync();

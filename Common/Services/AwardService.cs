@@ -10,6 +10,9 @@ public class AwardService : BaseService
     {
     }
 
+    public static bool HasArtist(Award award, int artistId)
+        => award.Artists.Any(a => a.Id == artistId);
+
     public async Task<List<Award>> GetAll()
     {
         return await _context.Awards
@@ -70,7 +73,6 @@ public class AwardService : BaseService
         var artist = await _context.Artists.FindAsync(artistId);
         if(artist == null) return false;
 
-        if(award.Artists.Any(a => a.Id == artistId)) return false;
 
         award.Artists.Add(artist);
         await _context.SaveChangesAsync();

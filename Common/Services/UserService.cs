@@ -14,7 +14,9 @@ public class UserService : BaseService
     }
 
     public async Task<bool> UsernameExists(string username)
-    => await _context.Users.AnyAsync(u => u.Username == username);
+    {
+       return await _context.Users.AnyAsync(u => u.Username == username);
+    }
 
     public static string HashPassword(string password)
     {

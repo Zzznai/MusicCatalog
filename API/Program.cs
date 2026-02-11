@@ -3,7 +3,6 @@ using Common.Enums;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MusicCatalog.Api.Services;
@@ -14,10 +13,8 @@ using MusicCatalog.Common.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = "Server=(localdb)\\mssqllocaldb;Database=MusicCatalogDb;Trusted_Connection=True;MultipleActiveResultSets=true";
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString,
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("MusicCatalog.Api")));
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -48,7 +45,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "MusicCalalog",
+        ValidIssuer = "MusicCatalog",
         ValidAudience = "Users",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("!Password123!Password123!Password123"))
     };
@@ -58,7 +55,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 var app = builder.Build();
-app.MapOpenApi();
+
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

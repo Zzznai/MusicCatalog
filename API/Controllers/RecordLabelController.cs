@@ -34,7 +34,7 @@ public class RecordLabelController:ControllerBase
         var label = await _recordLabelService.GetById(id);
         if (label == null)
         {
-            return NotFound();
+            return NotFound("Record Label not found.");
         }
         return Ok(RecordLabelResponse.FromEntity(label));
     }
@@ -49,7 +49,7 @@ public class RecordLabelController:ControllerBase
             CountryId = createRecordLabelRequest.CountryId,
             FoundedYear = createRecordLabelRequest.FoundedYear
         });
-        if (label == null) return NotFound();
+        if (label == null) return NotFound("Country not found.");
         return Ok(RecordLabelResponse.FromEntity(label));
     }
 
@@ -66,7 +66,7 @@ public class RecordLabelController:ControllerBase
 
         if (label == null)
         {
-            return NotFound();
+            return NotFound("Record Label or Country not found.");
         }
         return Ok(RecordLabelResponse.FromEntity(label));
     }
@@ -79,7 +79,7 @@ public class RecordLabelController:ControllerBase
 
         if (!deleted)
         {
-            return NotFound();
+            return NotFound("Record Label not found.");
         }
 
         return NoContent();

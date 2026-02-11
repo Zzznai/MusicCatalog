@@ -33,7 +33,7 @@ public class ArtistController : ControllerBase
     {
         var artist = await _artistService.GetById(id);
         if (artist == null)
-            return NotFound();
+            return NotFound("Artist not found.");
         return Ok(ArtistResponse.FromEntity(artist));
     }
 
@@ -47,7 +47,7 @@ public class ArtistController : ControllerBase
             Description = createArtistRequest.Description,
             RecordLabelId = createArtistRequest.RecordLabelId
         });
-        if(artist == null) return NotFound();
+        if(artist == null) return NotFound("Record Label not found.");
         return Ok(ArtistResponse.FromEntity(artist));
     }
 
@@ -63,7 +63,7 @@ public class ArtistController : ControllerBase
         });
 
         if (artist == null)
-            return NotFound();
+            return NotFound("Artist or Record Label not found.");
         return Ok(ArtistResponse.FromEntity(artist));
     }
 
@@ -73,7 +73,7 @@ public class ArtistController : ControllerBase
     {
         var deleted = await _artistService.Delete(id);
         if (!deleted)
-            return NotFound();
+            return NotFound("Artist not found.");
         return NoContent();
     }
 }

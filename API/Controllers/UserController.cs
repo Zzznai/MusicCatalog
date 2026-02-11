@@ -37,7 +37,7 @@ public class UserController:ControllerBase
         var user = await _userService.GetById(id);
         if(user == null)
         {
-            return NotFound();
+            return NotFound("User not found.");
         }
 
         return Ok(UserResponse.FromEntity(user));
@@ -49,7 +49,7 @@ public class UserController:ControllerBase
     {
         var user = await _userService.GetByUsername(username);
         if(user == null)
-          return NotFound();
+          return NotFound("User not found.");
         
         return Ok(UserResponse.FromEntity(user));
     }
@@ -73,7 +73,7 @@ public class UserController:ControllerBase
         var deleted = await _userService.Delete(id);
 
         if(deleted == false)
-          return NotFound();
+          return NotFound("User not found.");
 
         return NoContent();
     }

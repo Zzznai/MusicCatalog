@@ -35,7 +35,7 @@
             var genre = await _genreService.GetById(id);
             if (genre == null)
             {
-                return NotFound();
+                return NotFound("Genre not found.");
             }
             return Ok(GenreResponse.FromEntity(genre));
         }
@@ -55,7 +55,7 @@
             var genre = await _genreService.Update(id, updateGenreRequest.Name);
             if (genre == null)
             {
-                return NotFound();
+                return NotFound("Genre not found.");
             }
             return Ok(GenreResponse.FromEntity(genre));
         }
@@ -68,7 +68,7 @@
 
             if(deleted == false)
             {
-                return NotFound();
+                return NotFound("Genre not found.");
             }
             else
             {

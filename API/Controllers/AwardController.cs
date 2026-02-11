@@ -34,7 +34,7 @@ public class AwardController : ControllerBase
         var award = await _awardService.GetById(id);
         if (award == null)
         {
-            return NotFound();
+            return NotFound("Award not found.");
         }
         return Ok(AwardResponse.FromEntity(award));
     }
@@ -54,7 +54,7 @@ public class AwardController : ControllerBase
         var award = await _awardService.Update(id, updateAwardRequest.Name, updateAwardRequest.Year);
         if (award == null)
         {
-            return NotFound();
+            return NotFound("Award not found.");
         }
         return Ok(AwardResponse.FromEntity(award));
     }
@@ -67,7 +67,7 @@ public class AwardController : ControllerBase
 
         if (deleted == false)
         {
-            return NotFound();
+            return NotFound("Award not found.");
         }
         else
         {
@@ -80,12 +80,12 @@ public class AwardController : ControllerBase
     public async Task<IActionResult> AddWinner(int awardId, int artistId)
     {
         var award = await _awardService.GetById(awardId);
-        if (award == null) return NotFound();
+        if (award == null) return NotFound("Award not found.");
         if (AwardService.HasArtist(award, artistId))
             return BadRequest("Award already has this artist.");
 
         var added = await _awardService.AddWinner(awardId, artistId);
-        if (!added) return NotFound();
+        if (!added) return NotFound("Artist not found.");
 
         award = await _awardService.GetById(awardId);
         return Ok(AwardResponse.FromEntity(award));
@@ -96,12 +96,12 @@ public class AwardController : ControllerBase
     public async Task<IActionResult> RemoveWinner(int awardId, int artistId)
     {
         var award = await _awardService.GetById(awardId);
-        if (award == null) return NotFound();
+        if (award == null) return NotFound("Award not found.");
         if (!AwardService.HasArtist(award, artistId))
             return BadRequest("Award does not have this artist.");
 
         var removed = await _awardService.RemoveWinner(awardId, artistId);
-        if (!removed) return NotFound();
+        if (!removed) return NotFound("Artist not found.");
 
         return NoContent();
     }

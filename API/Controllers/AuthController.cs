@@ -26,7 +26,7 @@ public class AuthController:ControllerBase
     {
         var user = await _userService.Authenticate(loginRequest.Username, loginRequest.Password);
 
-        if(user == null) return Unauthorized();
+        if(user == null) return Unauthorized("Invalid username or password!!");
 
         string token = _tokenService.CreateToken(user);
 

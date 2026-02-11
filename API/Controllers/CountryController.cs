@@ -34,7 +34,7 @@ public class CountryController : ControllerBase
         var country = await _countryService.GetById(id);
         if (country == null)
         {
-            return NotFound();
+            return NotFound("Country not found.");
         }
         return Ok(CountryResponse.FromEntity(country));
     }
@@ -54,7 +54,7 @@ public class CountryController : ControllerBase
         var country = await _countryService.Update(id, updateCountryRequest.Name);
         if (country == null)
         {
-            return NotFound();
+            return NotFound("Country not found.");
         }
         return Ok(CountryResponse.FromEntity(country));
     }
@@ -67,7 +67,7 @@ public class CountryController : ControllerBase
 
         if (deleted == false)
         {
-            return NotFound();
+            return NotFound("Country not found.");
         }
         return NoContent();
     }

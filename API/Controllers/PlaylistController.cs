@@ -37,7 +37,7 @@ public class PlaylistController:ControllerBase
     {
         var playlist = await _playlistService.GetById(id);
 
-        if (playlist == null) return NotFound();
+        if (playlist == null) return NotFound("Playlist not found.");
 
         return Ok(PlaylistResponse.FromEntity(playlist));
     }
@@ -76,7 +76,7 @@ public class PlaylistController:ControllerBase
             UserId = userId
         });
 
-        if(playlist == null) return NotFound();
+        if(playlist == null) return NotFound("User not found.");
 
         return Ok(PlaylistResponse.FromEntity(playlist));
     }
@@ -89,7 +89,7 @@ public class PlaylistController:ControllerBase
 
         var existing = await _playlistService.Update(id, userId, updatePlaylistRequest.Name);
 
-        if(existing == null) return NotFound();
+        if(existing == null) return NotFound("Playlist not found or access denied.");
 
         return Ok(PlaylistResponse.FromEntity(existing));
     }
@@ -102,7 +102,7 @@ public class PlaylistController:ControllerBase
         
         var deleted = await _playlistService.Delete(id, userId);
 
-        if(deleted == false) return NotFound();
+        if(deleted == false) return NotFound("Playlist not found or access denied.");
 
         return NoContent();
 
@@ -115,15 +115,15 @@ public class PlaylistController:ControllerBase
         var userId = int.Parse(User.FindFirst("loggedUserId")!.Value);
 
         var playlist = await _playlistService.GetById(playlistId);
-        if (playlist == null) return NotFound();
+        if (playlist == null) return NotFound("Playlist not found.");
         if (PlaylistService.HasSong(playlist, songId))
             return BadRequest("Playlist already contains this song.");
 
-        var added = await _playlistService.AddSong(playlistId, userId, songId);
-        if(added == false) return NotFound();
+        if (!await _playlistService.AddSong(playlistId, userId, songId))
+            return NotFound("Song not found or access denied.");
 
-        var currentPlaylist = await _playlistService.GetById(playlistId);
-        return Ok(PlaylistResponse.FromEntity(currentPlaylist));
+        playlist = await _playlistService.GetById(playlistId);
+        return Ok(PlaylistResponse.FromEntity(playlist));
     }
 
     [HttpDelete("{playlistId}/song/{songId}")]
@@ -133,12 +133,12 @@ public class PlaylistController:ControllerBase
         var userId = int.Parse(User.FindFirst("loggedUserId")!.Value);
 
         var playlist = await _playlistService.GetById(playlistId);
-        if (playlist == null) return NotFound();
+        if (playlist == null) return NotFound("Playlist not found.");
         if (!PlaylistService.HasSong(playlist, songId))
             return BadRequest("Playlist does not contain this song.");
 
-        var removed = await _playlistService.RemoveSong(playlistId, userId, songId);
-        if(removed == false) return NotFound();
+        if (!await _playlistService.RemoveSong(playlistId, userId, songId))
+            return NotFound("Song not found or access denied.");
 
         return NoContent();
     }

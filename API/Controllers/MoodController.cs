@@ -31,7 +31,7 @@ public class MoodController:ControllerBase
     {
         var mood = await _moodService.GetById(id);
         if (mood == null)
-            return NotFound();
+            return NotFound("Mood not found.");
         return Ok(MoodResponse.FromEntity(mood));
     }
 
@@ -50,7 +50,7 @@ public class MoodController:ControllerBase
     {
         var mood = await _moodService.Update(id, updateMoodRequest.Name);
         if (mood == null)
-            return NotFound();
+            return NotFound("Mood not found.");
         return Ok(MoodResponse.FromEntity(mood));
     }
 
@@ -63,7 +63,7 @@ public class MoodController:ControllerBase
 
         if(deleted == false)
         {
-            return NotFound();
+            return NotFound("Mood not found.");
         }
         else
         {

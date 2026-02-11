@@ -34,7 +34,7 @@ public class AlbumController:ControllerBase
     public async Task<IActionResult> GetById(int id)
     {
         var album = await _albumService.GetById(id);
-        if(album == null) return NotFound();
+        if(album == null) return NotFound("Album with such ID could not be found");
 
         return Ok(AlbumResponse.FromEntity(album));
     }
@@ -51,7 +51,7 @@ public class AlbumController:ControllerBase
         });
 
         if(album == null)
-           return NotFound();
+           return NotFound("Could find the Artist with such ID");
         
         return Ok(AlbumResponse.FromEntity(album));
     }
@@ -69,7 +69,7 @@ public class AlbumController:ControllerBase
         });
 
          if(album == null)
-           return NotFound();
+           return NotFound("Album or Artist not found.");
         
         return Ok(AlbumResponse.FromEntity(album));
     }
@@ -82,7 +82,7 @@ public class AlbumController:ControllerBase
         var deleted = await _albumService.Delete(id);
 
         if(!deleted)
-          return NotFound(); 
+          return NotFound("Album not found."); 
 
         return NoContent();
     }
@@ -92,18 +92,15 @@ public class AlbumController:ControllerBase
     public async Task<IActionResult> AddSong(int albumId, int songId)
     {
         var album = await _albumService.GetById(albumId);
-        if (album == null) return NotFound();
+        if (album == null) return NotFound("Album not found.");
         if (AlbumService.HasSong(album, songId))
             return BadRequest("Album already contains this song.");
 
-        var added = await _albumService.AddSong(albumId, songId);
-        if(added == true)
-        {
-            album = await _albumService.GetById(albumId);
-            return Ok(AlbumResponse.FromEntity(album));
-        }
+        if (!await _albumService.AddSong(albumId, songId))
+            return NotFound("Song not found.");
 
-        return NotFound();
+        album = await _albumService.GetById(albumId);
+        return Ok(AlbumResponse.FromEntity(album));
     }
 
     [HttpDelete("{albumId}/song/{songId}")]
@@ -111,18 +108,15 @@ public class AlbumController:ControllerBase
     public async Task<IActionResult> RemoveSong(int albumId, int songId)
     {
         var album = await _albumService.GetById(albumId);
-        if (album == null) return NotFound();
+        if (album == null) return NotFound("Album not found.");
         if (!AlbumService.HasSong(album, songId))
             return BadRequest("Album does not contain this song.");
 
-        var deleted = await _albumService.RemoveSong(albumId, songId);
-        if(deleted == true)
-        {
-            album = await _albumService.GetById(albumId);
-            return Ok(AlbumResponse.FromEntity(album));
-        }
+        if (!await _albumService.RemoveSong(albumId, songId))
+            return NotFound("Song not found.");
 
-        return NotFound();
+        album = await _albumService.GetById(albumId);
+        return Ok(AlbumResponse.FromEntity(album));
     }
 
     [HttpPut("{albumId}/mood/{moodId}")]
@@ -130,18 +124,15 @@ public class AlbumController:ControllerBase
     public async Task<IActionResult> AddMood(int albumId, int moodId)
     {
         var album = await _albumService.GetById(albumId);
-        if (album == null) return NotFound();
+        if (album == null) return NotFound("Album not found.");
         if (AlbumService.HasMood(album, moodId))
             return BadRequest("Album already contains this mood.");
 
-        var added = await _albumService.AddMood(albumId, moodId);
-        if(added == true)
-        {
-            album = await _albumService.GetById(albumId);
-            return Ok(AlbumResponse.FromEntity(album));
-        }
+        if (!await _albumService.AddMood(albumId, moodId))
+            return NotFound("Mood not found.");
 
-        return NotFound();
+        album = await _albumService.GetById(albumId);
+        return Ok(AlbumResponse.FromEntity(album));
     }
 
     [HttpDelete("{albumId}/mood/{moodId}")]
@@ -149,18 +140,15 @@ public class AlbumController:ControllerBase
     public async Task<IActionResult> RemoveMood(int albumId, int moodId)
     {
         var album = await _albumService.GetById(albumId);
-        if (album == null) return NotFound();
+        if (album == null) return NotFound("Album not found.");
         if (!AlbumService.HasMood(album, moodId))
             return BadRequest("Album does not contain this mood.");
 
-        var deleted = await _albumService.RemoveMood(albumId, moodId);
-        if(deleted == true)
-        {
-            album = await _albumService.GetById(albumId);
-            return Ok(AlbumResponse.FromEntity(album));
-        }
+        if (!await _albumService.RemoveMood(albumId, moodId))
+            return NotFound("Mood not found.");
 
-        return NotFound();
+        album = await _albumService.GetById(albumId);
+        return Ok(AlbumResponse.FromEntity(album));
     }
 
 

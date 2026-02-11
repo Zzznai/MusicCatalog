@@ -35,7 +35,7 @@ public class SongController:ControllerBase
     {
         var song = await _songService.GetById(id);
         
-        if(song == null) return NotFound();
+        if(song == null) return NotFound("Song not found.");
 
         return Ok(SongResponse.FromEntity(song));
     }
@@ -58,7 +58,7 @@ public string Title { get; set; } = string.Empty;
             AlbumId = createSongRequest.AlbumId
         });
 
-        if(song == null) return NotFound();
+        if(song == null) return NotFound("Artist or Album not found.");
 
         return Ok(SongResponse.FromEntity(song));
 
@@ -76,7 +76,7 @@ public string Title { get; set; } = string.Empty;
             AlbumId = updateSongRequest.AlbumId
         });
 
-        if(updated == null) return NotFound();
+        if(updated == null) return NotFound("Song, Artist or Album not found.");
 
         return Ok(SongResponse.FromEntity(updated));
     }
@@ -87,7 +87,7 @@ public string Title { get; set; } = string.Empty;
     {
         var deleted = await _songService.Delete(id);
 
-        if(!deleted) return NotFound();
+        if(!deleted) return NotFound("Song not found.");
 
         return NoContent();
     }
@@ -97,12 +97,12 @@ public string Title { get; set; } = string.Empty;
     public async Task<IActionResult> AddGenre(int songId, int genreId)
     {
         var song = await _songService.GetById(songId);
-        if (song == null) return NotFound();
+        if (song == null) return NotFound("Song not found.");
         if (SongService.HasGenre(song, genreId))
             return BadRequest("Song already has this genre.");
 
-        var added = await _songService.AddGenre(songId, genreId);
-        if(added == false) return NotFound();
+        if (!await _songService.AddGenre(songId, genreId))
+            return NotFound("Genre not found.");
 
         song = await _songService.GetById(songId);
         return Ok(SongResponse.FromEntity(song));
@@ -113,12 +113,12 @@ public string Title { get; set; } = string.Empty;
     public async Task<IActionResult> RemoveGenre(int songId, int genreId)
     {
         var song = await _songService.GetById(songId);
-        if (song == null) return NotFound();
+        if (song == null) return NotFound("Song not found.");
         if (!SongService.HasGenre(song, genreId))
             return BadRequest("Song does not have this genre.");
 
-        var removed = await _songService.RemoveGenre(songId, genreId);
-        if(removed == false) return NotFound();
+        if (!await _songService.RemoveGenre(songId, genreId))
+            return NotFound("Genre not found.");
 
         return NoContent();
     }
